@@ -20,6 +20,7 @@
 * use the fg= parameter to give widgets text a different color from the background
 * bg for widget background
 * the after() method can be used on a window object to call a function after a given interval
+  * use after_cancel(widget) to suspend scheduling
 * canvas.itemconfig(item_to_alter, **kwarg to alter)
 
 # dynamic typing
