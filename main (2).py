@@ -14,12 +14,18 @@ LONG_BREAK_MIN = 1
 reps = 0
 check_mult = 0
 checks = ""
+timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 
 def reset_timer():
-    pass  # TODO make the "resert" button reset the current timer
+    check.config(text="")
+    timer_label.config(text="P O M O")
+    canvas.itemconfig(timer_text, text="00:00")
+    window.after_cancel(timer)
+    global reps
+    reps = 0
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 
 
@@ -27,11 +33,7 @@ def start_timer():
     global reps
     global checks
     global check_mult
-    if reps % 2 == 0:
-        check_mult += 1
     reps += 1
-    check = tk.Label(text=checks, bg=BACK, font=("arial", 24, "normal"))
-    check.grid(column=1, row=4)
     if reps % 2 == 1:
         # odd # of reps
         timer_label.config(fg="#00FFCA", text="W O R K", bg="#088395")
@@ -43,9 +45,10 @@ def start_timer():
         timer_label.config(fg="red", text="B R E A K")
         minutes = LONG_BREAK_MIN
     checks = ""
+    check_mult = reps // 2
     checks += "💯" * check_mult
-    print(f"{checks=}")
-    countdown(minutes * 60)  # 300 seconds, or 5 minutes
+    check.config(text=checks)
+    countdown(minutes * 60)
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
 
 
@@ -61,7 +64,8 @@ def countdown(count):
         seconds = f"0{seconds}"
     canvas.itemconfig(timer_text, text=f"{minutes}:{seconds}")  # could have used :2d to format for leading zeroes
     if count > 0:
-        window.after(25, countdown, count - 1)
+        global timer
+        timer = window.after(1000, countdown, count - 1)
         # window.after(60_000, countdown, minutes - 1, seconds)
     if count == 0:
         start_timer()
@@ -97,9 +101,11 @@ start_button = tk.Button(text="Start", bg=GREEN, command=start_timer)
 start_button.grid(column=0, row=3)
 
 # 2, 3
-restart_button = tk.Button(text="Restart", bg=GREEN, anchor="e", command=start_timer)
+restart_button = tk.Button(text="Restart", bg=GREEN, anchor="e", command=reset_timer)
 restart_button.grid(column=3, row=3)
 
 # 1, 4
+check = tk.Label(text=checks, bg=BACK, font=("arial", 24, "normal"))
+check.grid(column=1, row=4)
 
 window.mainloop()
