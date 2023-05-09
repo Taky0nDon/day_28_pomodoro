@@ -1,5 +1,5 @@
 import tkinter as tk
-
+import time
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -8,15 +8,18 @@ GREEN = "#38E54D"
 YELLOW = "#f7f5dd"
 BACK = "#BAD7E9"
 FONT_NAME = "Courier"
-WORK_MIN = 1
-SHORT_BREAK_MIN = 1
-LONG_BREAK_MIN = 1
+WORK_MIN = 25
+SHORT_BREAK_MIN = 5
+LONG_BREAK_MIN = 20
 reps = 0
 check_mult = 0
 checks = ""
 timer = None
+paused = False
+seconds = None
+minutes = None
 
-# ---------------------------- TIMER RESET ------------------------------- # 
+# ---------------------------- TIMER RESET ------------------------------- #
 
 
 def reset_timer():
@@ -33,6 +36,9 @@ def start_timer():
     global reps
     global checks
     global check_mult
+    window.attributes("-topmost", True)
+    time.sleep(0.2)
+    window.attributes("-topmost", False)
     reps += 1
     if reps % 2 == 1:
         # odd # of reps
@@ -49,12 +55,15 @@ def start_timer():
     checks += "💯" * check_mult
     check.config(text=checks)
     countdown(minutes * 60)
-# ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
+# ---------------------------- BRING TO TOP ------------------------------- #
+
+# ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
 
-def countdown(count):
+def countdown(count=seconds):
     """it's recursive!"""
-    global reps
+    global reps, seconds, minutes
+
     # count represents the seconds
     # count // 60 = minutes
     # count % 60 = seconds
@@ -70,7 +79,17 @@ def countdown(count):
     if count == 0:
         start_timer()
 # ---------------------------- UI SETUP ------------------------------- #
-
+# ---------------------------- PAUSE / RESET ------------------------------- #
+def pause_timer():
+    global timer, paused, seconds, minutes
+    if not timer:
+        pass
+    elif not paused:
+        window.after_cancel(timer)
+        paused = True
+    else:
+        countdown(seconds + minutes*60)
+        paused = False
 
 window = tk.Tk()
 window.title("Pomodoro")
@@ -99,6 +118,10 @@ empty_row.grid(column=1, row=1)
 # 0, 3
 start_button = tk.Button(text="Start", bg=GREEN, command=start_timer)
 start_button.grid(column=0, row=3)
+
+# 1, 3
+pause = tk.Button(text="Pause", bg=GREEN, command=pause_timer)
+pause.grid(column=1, row=3)
 
 # 2, 3
 restart_button = tk.Button(text="Restart", bg=GREEN, anchor="e", command=reset_timer)
