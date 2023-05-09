@@ -55,8 +55,6 @@ def start_timer():
     checks += "💯" * check_mult
     check.config(text=checks)
     countdown(minutes * 60)
-# ---------------------------- BRING TO TOP ------------------------------- #
-
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
 
@@ -78,8 +76,9 @@ def countdown(count=seconds):
         # window.after(60_000, countdown, minutes - 1, seconds)
     if count == 0:
         start_timer()
-# ---------------------------- UI SETUP ------------------------------- #
 # ---------------------------- PAUSE / RESET ------------------------------- #
+
+
 def pause_timer():
     global timer, paused, seconds, minutes
     if not timer:
@@ -90,6 +89,8 @@ def pause_timer():
     else:
         countdown(seconds + minutes*60)
         paused = False
+# ---------------------------- UI SETUP ------------------------------- #
+
 
 window = tk.Tk()
 window.title("Pomodoro")
