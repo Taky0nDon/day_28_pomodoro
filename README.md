@@ -1,3 +1,19 @@
+# OVERVIEW
+
+The app launches a Tk window. When the user clicks "Start," a 25 minute timer
+begins. The timer can be paused by clicking the "Pause" button. While paused,
+clicking "Pause" again will resume the timer. Clicking "Restart" while the 
+timer is running, or while paused, will reset the program to its default state.
+
+Once restarted, the user must click "Start" again to begin the pomodoro cycle
+anew.
+
+## Known issues:
+* The window is supposed to pop to the top of the screen every time a timer
+reaches 00:00. This is currently broken.
+
+
+# LESSON NOTES
 # the pomodoro technique 
     ## francesco 
 
