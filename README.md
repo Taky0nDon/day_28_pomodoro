@@ -5,6 +5,9 @@ begins. The timer can be paused by clicking the "Pause" button. While paused,
 clicking "Pause" again will resume the timer. Clicking "Restart" while the 
 timer is running, or while paused, will reset the program to its default state.
 
+After every completed "work" timer, a 💯 appears beneath the potato so the user
+can keep track of their progress.
+
 Once restarted, the user must click "Start" again to begin the pomodoro cycle
 anew.
 
