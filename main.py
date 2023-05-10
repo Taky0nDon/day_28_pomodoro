@@ -1,5 +1,6 @@
 import tkinter as tk
 import time
+import pomodorotimer
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -11,87 +12,75 @@ FONT_NAME = "Courier"
 WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
-reps = 0
-check_mult = 0
-checks = ""
-timer = None
-paused = False
-seconds = None
-minutes = None
 
 # ---------------------------- TIMER RESET ------------------------------- #
 
 
 def reset_timer():
+    if not pomodorotimer.timer:
+        return
     check.config(text="")
     timer_label.config(text="P O M O")
     canvas.itemconfig(timer_text, text="00:00")
-    window.after_cancel(timer)
-    global reps
-    reps = 0
-# ---------------------------- TIMER MECHANISM ------------------------------- # 
+    window.after_cancel(pomodorotimer.timer)
+    pomodorotimer.reps = 0
+    pomodorotimer.paused = False
+    pomodorotimer.timer = None
+# ---------------------------- TIMER MECHANISM ------------------------------- #
 
 
 def start_timer():
-    global reps
-    global checks
-    global check_mult
+    if pomodorotimer.paused or pomodorotimer.timer:
+        return
     window.attributes("-topmost", True)
     time.sleep(0.2)
     window.attributes("-topmost", False)
-    reps += 1
-    if reps % 2 == 1:
-        # odd # of reps
+    pomodorotimer.start()
+    if pomodorotimer.reps % 2 == 1:
         timer_label.config(fg="#00FFCA", text="W O R K", bg="#088395")
-        minutes = WORK_MIN
-    elif reps % 2 == 0 and reps != 8:  # even # of reps, reps is not a multiple of 8 (or 8)
+        pomodorotimer.minutes = WORK_MIN
+    elif pomodorotimer.reps % 2 == 0 and pomodorotimer.reps != 8:
         timer_label.config(fg="pink", text="sB R E A K", )
-        minutes = SHORT_BREAK_MIN
+        pomodorotimer.minutes = SHORT_BREAK_MIN
     else:
         timer_label.config(fg="red", text="B R E A K")
-        minutes = LONG_BREAK_MIN
-    checks = ""
-    check_mult = reps // 2
-    checks += "💯" * check_mult
-    check.config(text=checks)
-    countdown(minutes * 60)
+        pomodorotimer.minutes = LONG_BREAK_MIN
+    check.config(text=pomodorotimer.checks)
+    countdown(pomodorotimer.minutes * 60)
+
+
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
 
-def countdown(count=seconds):
+def countdown(count=None):
     """it's recursive!"""
-    global reps, seconds, minutes
-
-    # count represents the seconds
-    # count // 60 = minutes
-    # count % 60 = seconds
-    minutes = count // 60
-    seconds = count % 60
-    if seconds < 10:
-        seconds = f"0{seconds}"
-    canvas.itemconfig(timer_text, text=f"{minutes}:{seconds}")  # could have used :2d to format for leading zeroes
+    if not count:
+        count = pomodorotimer.seconds
+    pomodorotimer.minutes = count // 60
+    pomodorotimer.seconds = count % 60
+    if pomodorotimer.seconds < 10:
+        pomodorotimer.seconds = f"0{pomodorotimer.seconds}"
+    canvas.itemconfig(timer_text, text=f"{pomodorotimer.minutes}:{pomodorotimer.seconds}")  # could have used :2d to format for leading zeroes
     if count > 0:
-        global timer
-        timer = window.after(1000, countdown, count - 1)
-        # window.after(60_000, countdown, minutes - 1, seconds)
+        pomodorotimer.timer = window.after(1000, countdown, count - 1)
     if count == 0:
         start_timer()
 # ---------------------------- PAUSE / RESET ------------------------------- #
 
 
 def pause_timer():
-    global timer, paused, seconds, minutes
-    if not timer:
-        pass
-    elif not paused:
-        window.after_cancel(timer)
-        paused = True
+    if not pomodorotimer.timer:
+        return
+    elif not pomodorotimer.paused:
+        window.after_cancel(pomodorotimer.timer)
+        pomodorotimer.paused = True
     else:
-        countdown(seconds + minutes*60)
-        paused = False
+        countdown(pomodorotimer.seconds + pomodorotimer.minutes*60)
+        pomodorotimer.paused = False
 # ---------------------------- UI SETUP ------------------------------- #
 
-
+pomodorotimer = pomodorotimer.PomodoroTimer()
+pomodorotimer.timer = None
 window = tk.Tk()
 window.title("Pomodoro")
 window.config(padx=50, pady=25, bg="#BAD7E9")
@@ -129,7 +118,7 @@ restart_button = tk.Button(text="Restart", bg=GREEN, anchor="e", command=reset_t
 restart_button.grid(column=3, row=3)
 
 # 1, 4
-check = tk.Label(text=checks, bg=BACK, font=("arial", 24, "normal"))
+check = tk.Label(text=pomodorotimer.checks, bg=BACK, font=("arial", 24, "normal"))
 check.grid(column=1, row=4)
 
 window.mainloop()
