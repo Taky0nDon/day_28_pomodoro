@@ -9,7 +9,7 @@ GREEN = "#38E54D"
 YELLOW = "#f7f5dd"
 BACK = "#BAD7E9"
 FONT_NAME = "Courier"
-WORK_MIN = 25
+WORK_MIN = 30
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 
@@ -46,7 +46,7 @@ def start_timer():
         timer_label.config(fg="red", text="B R E A K")
         pomodorotimer.minutes = LONG_BREAK_MIN
     check.config(text=pomodorotimer.checks)
-    countdown(pomodorotimer.minutes * 60)
+    countdown(int(pomodorotimer.minutes) * 60)
 
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
@@ -54,17 +54,19 @@ def start_timer():
 
 def countdown(count=None):
     """it's recursive!"""
+    print(f"{count=}")
     if not count:
         count = pomodorotimer.seconds
-    pomodorotimer.minutes = count // 60
-    pomodorotimer.seconds = count % 60
+    pomodorotimer.minutes = int(count) // 60
+    pomodorotimer.seconds = int(count) % 60
     if pomodorotimer.seconds < 10:
         pomodorotimer.seconds = f"0{pomodorotimer.seconds}"
     canvas.itemconfig(timer_text, text=f"{pomodorotimer.minutes}:{pomodorotimer.seconds}")  # could have used :2d to format for leading zeroes
+    if count == 0:
+        pomodorotimer.timer = False
+        start_timer()
     if count > 0:
         pomodorotimer.timer = window.after(1000, countdown, count - 1)
-    if count == 0:
-        start_timer()
 # ---------------------------- PAUSE / RESET ------------------------------- #
 
 
